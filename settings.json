@@ -1,0 +1,6 @@
+{
+    "DeleteTradeReceived": false,
+    "DeleteTradeAccepted": false,
+    "DeleteTradeDeclined": false,
+    "DeleteTradeCountered": false
+}
