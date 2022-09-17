@@ -23,7 +23,7 @@ func GetMessageType(Message MessageStruct) string {
 	return "N/A"
 }
 
-func HandleMessages(Messages []MessageStruct) {
+func HandleMessages(Messages []MessageStruct) []int {
 	MessagesToDelete := make([]int, 0)
 
 	for _, Message := range Messages {
@@ -39,13 +39,31 @@ func HandleMessages(Messages []MessageStruct) {
 		}
 	}
 
-	if len(MessagesToDelete) > 0 {
-		DeleteMessages(MessagesToDelete)
+	return MessagesToDelete
+}
+
+func ChunkArray(Array []int, Size int) [][]int {
+	var divided [][]int
+
+	chunkSize := (len(Array) + Size - 1) / Size
+
+	for i := 0; i < len(Array); i += chunkSize {
+		end := i + chunkSize
+
+		if end > len(Array) {
+			end = len(Array)
+		}
+
+		divided = append(divided, Array[i:end])
 	}
+
+	return divided
 }
 
 func ScanMessages() {
 	println("Running")
+
+	MessagesToDelete := make([]int, 0)
 
 	PreviousPageNumber := 0
 	for {
@@ -68,7 +86,7 @@ func ScanMessages() {
 				break
 			}
 
-			HandleMessages(Messages)
+			MessagesToDelete = append(MessagesToDelete, HandleMessages(Messages)...)
 			println(PageNumber)
 
 			Completed = IsEnd
@@ -82,6 +100,10 @@ func ScanMessages() {
 		if Completed {
 			break
 		}
+	}
+
+	for _, MessageDeleteChunk := range ChunkArray(MessagesToDelete, 50) {
+		DeleteMessages(MessageDeleteChunk)
 	}
 
 	println("Done!")
